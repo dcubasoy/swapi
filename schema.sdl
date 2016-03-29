@@ -1,0 +1,388 @@
+# Schema definition for *Star Wars API* backend in GraphQL/Relay
+
+## An individual person or character within the Star Wars universe.
+type Person implements Node @rootConnection(field: "allPeople") {
+  ## Node unique identifier.
+  id: ID!
+
+  ## The name of this person.
+  name: String!
+
+  ## The birth year of the person, using the in-universe standard of BBY or
+  ## ABY - Before the Battle of Yavin or After the Battle of Yavin. The Battle
+  ## of Yavin is a battle that occurs at the end of Star Wars episode IV: A
+  ## New Hope.
+  birthYear: String
+
+  ## The eye color of this person. Will be null if not known or "n/a" if the
+  ## person does not have an eye.
+  eyeColor: String
+
+  ## The hair color of this person. Will be n/a if not applicable or null
+  ## if unknown.
+  hairColor: String
+
+  ## The gender of this person. Will be n/a if not applicable or null if
+  ## unknown.
+  gender: String
+
+  ## The height of the person in centimeters.
+  height: Int
+
+  ## The mass of the person in kilograms.
+  mass: Float
+
+  ## The skin color of this person.
+  skinColor: String
+
+  ## A planet that this person was born on or inhabits.
+  homeWorlds: NodeConnection(Planet, residents)
+
+  ## Films that this person has been in.
+  films: NodeConnection(Film, characters)
+
+  ## Species that this person belongs to.
+  species: NodeConnection(Species, people)
+
+  ## Craft that this person has piloted.
+  craft: NodeConnection(Craft, pilots)
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+## A Star Wars film.
+type Film implements Node @rootConnection(field: "allFilms") {
+  ## Node unique identifier.
+  id: ID!
+
+  ## The title of this film.
+  title: String!
+
+  ## The episode number of this film.
+  episodeId: Int!   @rootPluralId(field: "episode")
+
+  ## The opening paragraphs at the beginning of this film.
+  openingCrawl: String
+
+  ## The name of the director of this film.
+  director: String
+
+  ## List of the producers of this film.
+  producers: [String!]
+
+  ## The ISO 8601 date format of film release at original creator country.
+  releaseDate: String
+
+  ## Species that are in this film.
+  species: NodeConnection(Species, films)
+
+  ## Craft that are in this film.
+  craft: NodeConnection(Craft, films)
+
+  ## People that are in this film.
+  characters: NodeConnection(Person, films)
+
+  ## Planets that are in this film.
+  planets: NodeConnection(Planet, films)
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+## A Planet is a large mass, planet or planetoid in the Star Wars Universe,
+## at the time of 0 ABY.
+type Planet implements Node @rootConnection(field: "allPlanets") {
+  ## Node unique identifier.
+  id: ID!
+
+  ## The name of this planet.
+  name: String!
+
+  ## The diameter of this planet in kilometers.
+  diameter: Int
+
+  ## The number of standard hours it takes for this planet to complete a single
+  ## rotation on its axis.
+  rotationPeriod: Int
+
+  ## The number of standard days it takes for this planet to complete a single
+  ## orbit of its local star.
+  orbitalPeriod: Int
+
+  ## A number denoting the gravity of this planet, where 1 is normal or 1
+  ## standard G. 2 is twice or 2 standard Gs. 0.5 is half or 0.5 standard Gs.
+  gravity: String
+
+  ## The average population of sentient beings inhabiting this planet.
+  population: Int
+
+  ## List of the climates of this planet.
+  climates: [String!]
+
+  ## List of the terrains of this planet.
+  terrains: [String!]
+
+  ## The percentage of the planet surface that is naturally occurring water or
+  ## bodies of water.
+  surfaceWater: Float
+
+  ## People that live on this planet.
+  residents: NodeConnection(Person, homeWorlds)
+
+  ## Films that this planet has appeared in.
+  films: NodeConnection(Film, planets)
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+## A Species is a type of person or character within the Star Wars Universe.
+type Species implements Node @rootConnection(field: "allSpecies") {
+  ## Node unique identifier.
+  id: ID!
+
+  ## The name of this species.
+  name: String
+
+  ## The classification of this species, such as "mammal" or "reptile".
+  classification: String
+
+  ## The designation of this species, such as "SENTIENT".
+  designation: Designation
+
+  ## The average height of this species in centimeters.
+  averageHeight: Float
+
+  ## The average lifespan of this species in years.
+  averageLifespan: Int
+
+  ## Common eye colors for this species, empty list if this species does
+  ## not typically have eyes and null if unknown.
+  eyeColors: [String!]
+
+  ## Common hair colors for this species, empty list if this species does
+  ## not typically have hair and null if unknown.
+  hairColors: [String!]
+
+  ## Common skin colors for this species, empty list if this species does
+  ## not typically have skin and null if unknown.
+  skinColors: [String!]
+
+  ## The language commonly spoken by this species.
+  language: String
+
+  ## A planet that this species originates from.
+  homeWorld: Planet
+
+  ## People that are a part of this species.
+  people: NodeConnection(Person, species)
+
+  ## Films that this species has appeared in.
+  films: NodeConnection(Film, species)
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+## Craft represents a transport craft
+interface Craft {
+  ## The name of this starship. The common name, such as Death Star.
+  name: String!
+
+  ## The model or official name of this starship. Such as T-65 X-wing
+  ## or DS-1 Orbital Battle Station.
+  model: String
+
+  ## The class of this starship, such as Starfighter or Deep Space Mobile
+  ## Battlestation
+  class: String
+
+  ## The manufacturers of this starship.
+  manufacturers: [String!]
+
+  ## The cost of this starship new, in galactic credits.
+  costInCredits: Int
+
+  ## The length of this starship in meters.
+  length: Float
+
+  ## The number of personnel needed to run or pilot this starship.
+  crew: String
+
+  ## The number of non-essential people this starship can transport.
+  passengers: String
+
+  ## The maximum speed of this starship in atmosphere. null if this starship
+  ## is incapable of atmospheric flight.
+  maxAtmosphericSpeed: Int
+
+  ## The maximum number of kilograms that this starship can transport.
+  cargoCapacity: Int
+
+  ## The maximum length of time that this starship can provide consumables
+  ## for its entire crew without having to resupply.
+  consumables: Duration
+
+  ## Films that this starship has appeared in.
+  films: NodeConnection(Film, craft)
+
+  ## People that this starship has been piloted by.
+  pilots: NodeConnection(Person, craft)
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+## Starship is a transport craft that has hyperdrive capability.
+type Starship implements Node, Craft @rootConnection(field: "allStarships") {
+  ## Node unique identifier.
+  id: ID!
+
+  ## The name of this starship. The common name, such as Death Star.
+  name: String!
+
+  ## The model or official name of this starship. Such as T-65 X-wing
+  ## or DS-1 Orbital Battle Station.
+  model: String
+
+  ## The class of this starship, such as Starfighter or Deep Space Mobile
+  ## Battlestation
+  class: String
+
+  ## The manufacturers of this starship.
+  manufacturers: [String!]
+
+  ## The cost of this starship new, in galactic credits.
+  costInCredits: Int
+
+  ## The length of this starship in meters.
+  length: Float
+
+  ## The number of personnel needed to run or pilot this starship.
+  crew: String
+
+  ## The number of non-essential people this starship can transport.
+  passengers: String
+
+  ## The maximum speed of this starship in atmosphere. null if this starship
+  ## is incapable of atmospheric flight.
+  maxAtmosphericSpeed: Int
+
+  ## The maximum number of kilograms that this starship can transport.
+  cargoCapacity: Int
+
+  ## The maximum length of time that this starship can provide consumables
+  ## for its entire crew without having to resupply.
+  consumables: Duration
+
+  ## Films that this starship has appeared in.
+  films: NodeConnection(Film, craft)
+
+  ## People that this starship has been piloted by.
+  pilots: NodeConnection(Person, craft)
+
+  ## The Maximum number of Megalights this starship can travel in a standard
+  ## hour. A Megalight is a standard unit of distance and has never been
+  ## defined before within the Star Wars universe. This figure is only really
+  ## useful for measuring the difference in speed of starships. We can assume
+  ## it is similar to AU, the distance between our Sun (Sol) and Earth.
+  mglt: Int
+
+  ## The class of this starships hyperdrive.
+  hyperdriveRating: Float
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+## Vehicle is a transport craft that does not have hyperdrive capability.
+type Vehicle implements Node, Craft @rootConnection(field: "allVehicles") {
+  ## Node unique identifier.
+  id: ID!
+
+  ## The name of this vehicle. The common name, such as "Sand Crawler" or
+  ## "Speeder bike".
+  name: String!
+
+  ## The model or official name of this vehicle.
+  ## Such as "All-Terrain Attack Transport".
+  model: String
+
+  ## The class of this vehicle, such as "Wheeled" or "Repulsorcraft".
+  class: String
+
+  ## The manufacturers of this vehicle.
+  manufacturers: [String!]
+
+  ## The cost of this vehicle new, in galactic credits.
+  costInCredits: Int
+
+  ## The length of this vehicle in meters.
+  length: Float
+
+  ## The number of personnel needed to run or pilot this vehicle.
+  crew: String
+
+  ## The number of non-essential people this vehicle can transport.
+  passengers: String
+
+  ## The maximum speed of this vehicle in atmosphere. null if this vehicle
+  ## is incapable of atmospheric flight.
+  maxAtmosphericSpeed: Int
+
+  ## The maximum number of kilograms that this vehicle can transport.
+  cargoCapacity: Int
+
+  ## The maximum length of time that this vehicle can provide consumables
+  ## for its entire crew without having to resupply.
+  consumables: Duration
+
+  ## Films that this vehicle has appeared in.
+  films: NodeConnection(Film, craft)
+
+  ## People that this vehicle has been piloted by.
+  pilots: NodeConnection(Person, craft)
+
+  ## ISO 8601 date of when entry was created.
+  created: String
+
+  ## ISO 8601 date of when entry was edited.
+  edited: String
+}
+
+enum Designation {
+  SENTIENT
+  REPTILIAN
+}
+
+type Duration {
+  duration: Int
+  period: DurationPeriod
+}
+
+enum DurationPeriod {
+  HOURS
+  DAYS
+  WEEKS
+  MONTHS
+  YEARS
+}
